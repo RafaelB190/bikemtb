@@ -1,20 +1,41 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import FilterSideBar from "../components/FilterSideBar";
+import ProductList from "../components/ProductList";
+import "../styles/BrandList.css";
 
-const Brands = ["Venzo", "BH", "Vairo", "Scott", "SLP", "Trek"];
+const BrandsList = () => {
+  const [allProducts, setAllProducts] = useState([]); // Todos los productos
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  useEffect(() => {
+    fetch("https://fakestoreapi.com/products")
+      .then((response) => response.json())
+      .then((data) => {
+        setAllProducts(data);
+        setFilteredProducts(data);
+      })
+      .catch((error) => console.error("Error fetching products:", error));
+  }, []);
 
-function BrandsList() {
+  const handleFilter = (filter) => {
+    const { brand, minPrice, maxPrice } = filter;
+    const filtered = allProducts.filter((product) => {
+      const isWithinPriceRange =
+        product.price >= minPrice && product.price <= maxPrice;
+      const matchesBrand = brand ? product.brand === brand : true;
+      return isWithinPriceRange && matchesBrand;
+    });
+    setFilteredProducts(filtered);
+  };
+
   return (
-    <section>
-      <h2>Nuestras Marcas</h2>
-      <ul>
-        {Brands.map((Brand) => (
-          <li key={Brand}>
-            <Link to={`/Brand/${Brand.toLowerCase()}`}>{Brand}</Link>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div className="brands-list">
+      <FilterSideBar
+        brands={["venzo", "bh", "vairo", "scott", "slp", "trek"]}
+        onFilter={handleFilter}
+      />
+      <ProductList products={filteredProducts} />
+    </div>
   );
-}
+};
 
 export default BrandsList;

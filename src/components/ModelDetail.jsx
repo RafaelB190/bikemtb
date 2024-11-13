@@ -1,6 +1,19 @@
-import PropTypes from "prop-types";
+import { useParams } from "react-router-dom";
+import useFetchProducts from "../hooks/useFetchProducts";
 
-const ModelDetail = ({ model, brand, description, price, specs }) => {
+const ModelDetail = () => {
+  const { modelId } = useParams();
+  const { products, loading, error } = useFetchProducts();
+
+  if (loading) return <p>Cargando detalles...</p>;
+  if (error) return <p>Error al cargar el producto.</p>;
+
+  const product = products.find((product) => product.id === parseInt(modelId));
+
+  if (!product) return <p>Producto no encontrado.</p>;
+
+  const { model, brand, description, price, specs } = product;
+
   return (
     <div className="model-detail">
       <h1>
@@ -16,14 +29,6 @@ const ModelDetail = ({ model, brand, description, price, specs }) => {
       <h2>${price}</h2>
     </div>
   );
-};
-
-ModelDetail.propTypes = {
-  model: PropTypes.string.isRequired,
-  brand: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  price: PropTypes.number.isRequired,
-  specs: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default ModelDetail;

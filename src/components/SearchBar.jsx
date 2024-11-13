@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-
+import "../styles/SearchBar.css";
 function SearchBar({ onSearch }) {
   const [searchTerm, setSearchTerm] = useState("");
 

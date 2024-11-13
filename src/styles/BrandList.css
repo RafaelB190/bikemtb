@@ -1,0 +1,12 @@
+.brand-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.brand-list .brand-card {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}

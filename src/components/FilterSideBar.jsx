@@ -1,28 +1,42 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
-const FilterSideBar = ({ brands, onFilter }) => {
-  const [selectedBrand, setSelectedBrand] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+import { useContext, useState } from "react";
+import { FilterContext } from "../context/FilterContext";
+import "../styles/FilterSideBar.css";
+
+const FilterSideBar = ({ brands }) => {
+  const { filters, setFilters } = useContext(FilterContext);
+  const [selectedBrand, setSelectedBrand] = useState(filters.brand || "");
+  const [minPrice, setMinPrice] = useState(filters.minPrice || 0);
+  const [maxPrice, setMaxPrice] = useState(filters.maxPrice || 1000);
 
   const handleBrandChange = (event) => {
-    setSelectedBrand(event.target.value);
-    onFilter({ brand: event.target.value, priceRange });
+    const newBrand = event.target.value;
+    setSelectedBrand(newBrand);
+    setFilters((prevFilters) => ({ ...prevFilters, brand: newBrand }));
   };
 
-  const handlePriceChange = (event) => {
-    const newRange = event.target.value
-      .split(",")
-      .map((num) => parseInt(num, 10));
-    setPriceRange(newRange);
-    onFilter({ brand: selectedBrand, priceRange: newRange });
+  const handleMinPriceChange = (event) => {
+    const newMinPrice = parseInt(event.target.value, 10);
+    setMinPrice(newMinPrice);
+    setFilters((prevFilters) => ({ ...prevFilters, minPrice: newMinPrice }));
+  };
+
+  const handleMaxPriceChange = (event) => {
+    const newMaxPrice = parseInt(event.target.value, 10);
+    setMaxPrice(newMaxPrice);
+    setFilters((prevFilters) => ({ ...prevFilters, maxPrice: newMaxPrice }));
   };
 
   return (
     <div className="filter-sidebar">
       <h3>Filtrar</h3>
-      <div>
-        <label>Marca:</label>
-        <select value={selectedBrand} onChange={handleBrandChange}>
+      <div className="filter-group">
+        <label htmlFor="brand-select">Marca:</label>
+        <select
+          id="brand-select"
+          value={selectedBrand}
+          onChange={handleBrandChange}
+        >
           <option value="">Todas las marcas</option>
           {brands.map((brand) => (
             <option key={brand} value={brand}>
@@ -31,17 +45,27 @@ const FilterSideBar = ({ brands, onFilter }) => {
           ))}
         </select>
       </div>
-      <div>
+
+      <div className="filter-group">
         <label>Rango de precio:</label>
-        <input
-          type="range"
-          min="0"
-          max="1000"
-          step="10"
-          value={priceRange.join(",")}
-          onChange={handlePriceChange}
-        />
-        <span>{`$${priceRange[0]} - $${priceRange[1]}`}</span>
+        <div className="price-range">
+          <input
+            type="number"
+            min="0"
+            max="1000"
+            value={minPrice}
+            onChange={handleMinPriceChange}
+          />
+          <span>-</span>
+          <input
+            type="number"
+            min="0"
+            max="1000"
+            value={maxPrice}
+            onChange={handleMaxPriceChange}
+          />
+        </div>
+        <p>{`$${minPrice} - $${maxPrice}`}</p>
       </div>
     </div>
   );
@@ -49,7 +73,6 @@ const FilterSideBar = ({ brands, onFilter }) => {
 
 FilterSideBar.propTypes = {
   brands: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onFilter: PropTypes.func.isRequired,
 };
 
 export default FilterSideBar;
